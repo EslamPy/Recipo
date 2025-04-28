@@ -4,6 +4,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { admin, emailOTP } from "better-auth/plugins";
 import * as schema from "@/database/schema";
+import { sendEmail, generateOTPEmailTemplate } from "./email";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -13,8 +14,23 @@ export const auth = betterAuth({
   plugins: [
     nextCookies(),
     emailOTP({
-      async sendVerificationOTP({ otp }) {
-        console.log("OTP", otp);
+      async sendVerificationOTP({ otp, email }) {
+        console.log("Sending OTP code", otp, "to email", email);
+        
+        try {
+          const emailTemplate = generateOTPEmailTemplate(otp);
+          
+          await sendEmail({
+            to: email,
+            subject: "Your Recipo Verification Code",
+            html: emailTemplate,
+          });
+          
+          return { success: true };
+        } catch (error) {
+          console.error("Failed to send verification email:", error);
+          return { success: false };
+        }
       },
     }),
     admin(),
