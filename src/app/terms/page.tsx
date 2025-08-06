@@ -38,7 +38,7 @@ export default function TermsOfService() {
             
             <h2>Introduction</h2>
             <p>
-              Welcome to Recipo! These Terms of Service ("Terms") govern your access to and use of the Recipo website and services. By accessing or using our services, you agree to be bound by these Terms.
+              Welcome to Recipo! These Terms of Service (&quot;Terms&quot;) govern your access to and use of the Recipo website and services. By accessing or using our services, you agree to be bound by these Terms.
             </p>
             
             <h2>Using Recipo</h2>
