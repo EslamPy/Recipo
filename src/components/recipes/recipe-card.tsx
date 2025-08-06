@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Clock, ChefHat, Globe, Heart, Star, Utensils } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { RecipeWithCountry } from "@/types/recipe";
-import { useOptimistic, startTransition, useState, useEffect } from "react";
+import { useOptimistic, startTransition } from "react";
 import { likeRecipe } from "@/actions/recipe";
 import { Button } from "../ui/button";
 import { motion } from "framer-motion";
@@ -31,11 +31,6 @@ export default function RecipeCard({
   };
 
   const [optimisticLike, setOptimisticLike] = useOptimistic(isLiked);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   async function handleLike(e: React.MouseEvent) {
     e.preventDefault();

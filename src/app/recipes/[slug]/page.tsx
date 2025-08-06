@@ -15,6 +15,14 @@ import RecipeRelated from "@/components/recipes/recipe-related";
 
 type Params = Promise<{ slug: string }>;
 
+// Prevent static generation during build
+export const dynamic = 'force-dynamic'
+
+// Prevent static params generation during build
+export async function generateStaticParams() {
+  return []
+}
+
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
   const recipe = await getRecipeBySlug(slug);
@@ -23,14 +31,6 @@ export async function generateMetadata({ params }: { params: Params }) {
     title: recipe?.title,
     description: recipe?.description,
   };
-}
-
-export async function generateStaticParams() {
-  const recipes = await getAllRecipes({ limit: 100 });
-
-  return recipes.map((recipe) => ({
-    slug: recipe.slug,
-  }));
 }
 
 export default async function RecipePage({ params }: { params: Params }) {

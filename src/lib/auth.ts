@@ -26,10 +26,10 @@ export const auth = betterAuth({
             html: emailTemplate,
           });
           
-          return { success: true };
+          console.log("Verification email sent successfully");
         } catch (error) {
           console.error("Failed to send verification email:", error);
-          return { success: false };
+          throw error;
         }
       },
     }),
