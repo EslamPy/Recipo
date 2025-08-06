@@ -1,6 +1,6 @@
 import { db } from "./drizzle";
 import * as schema from "./schema";
-import { desc, eq, count, ilike } from "drizzle-orm";
+import { desc, eq, count, ilike, not, inArray } from "drizzle-orm";
 import { cache } from "react";
 import type {
   Country,
@@ -36,6 +36,7 @@ export const getAllRecipes = cache(
     limit = 12,
     offset = 0,
     countrySlug,
+    excludeIds,
   }: RecipeQueryOptions = {}): Promise<RecipeWithCountry[]> => {
     try {
       const query = db
@@ -57,6 +58,7 @@ export const getAllRecipes = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(
@@ -69,6 +71,10 @@ export const getAllRecipes = cache(
 
       if (countrySlug) {
         query.where(eq(schema.country.slug, countrySlug));
+      }
+
+      if (excludeIds && excludeIds.length > 0) {
+        query.where(not(inArray(schema.recipe.id, excludeIds)));
       }
 
       return query;
@@ -100,6 +106,7 @@ export const getFeaturedRecipes = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(
@@ -138,6 +145,7 @@ export const getRecipeBySlug = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(
@@ -178,6 +186,7 @@ export const getRecipesByCountry = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(
@@ -216,6 +225,7 @@ export const getRecipesBySearch = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(
@@ -289,6 +299,7 @@ export const getFavoriteRecipes = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(schema.likes, eq(schema.recipe.id, schema.likes.recipeId))

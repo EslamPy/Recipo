@@ -25,13 +25,13 @@ export async function generateMetadata({ params }: { params: Params }) {
   };
 }
 
-export async function generateStaticParams() {
-  const recipes = await getAllRecipes({ limit: 100 });
+// export async function generateStaticParams() {
+//   const recipes = await getAllRecipes({ limit: 100 });
 
-  return recipes.map((recipe) => ({
-    slug: recipe.slug,
-  }));
-}
+//   return recipes.map((recipe) => ({
+//     slug: recipe.slug,
+//   }));
+// }
 
 export default async function RecipePage({ params }: { params: Params }) {
   const { slug } = await params;

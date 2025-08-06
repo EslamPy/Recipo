@@ -54,7 +54,7 @@ export default function RecipeRelated({ recipes, country }: RecipeRelatedProps) 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {recipes.map((recipe, index) => (
+        {recipes.map((recipe) => (
           <motion.div key={recipe.id} variants={itemVariants}>
             <RecipeCard recipe={recipe} isLiked={false} />
           </motion.div>

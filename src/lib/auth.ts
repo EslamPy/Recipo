@@ -25,11 +25,8 @@ export const auth = betterAuth({
             subject: "Your Recipo Verification Code",
             html: emailTemplate,
           });
-          
-          return { success: true };
         } catch (error) {
           console.error("Failed to send verification email:", error);
-          return { success: false };
         }
       },
     }),
