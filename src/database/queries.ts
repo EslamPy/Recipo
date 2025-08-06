@@ -12,8 +12,9 @@ import type {
 export const getPopularCuisines = cache(async (): Promise<Country[]> => {
   try {
     return db.select().from(schema.country).orderBy(schema.country.name);
-  } catch {
-    throw new Error("Failed to fetch popular cuisines");
+  } catch (error) {
+    console.error("Error fetching popular cuisines:", error);
+    throw new Error("Failed to fetch popular cuisines. Please check your database connection.");
   }
 });
 
@@ -123,8 +124,9 @@ export const getFeaturedRecipes = cache(
         .orderBy(desc(schema.recipe.createdAt));
 
       return recipes;
-    } catch {
-      throw new Error("Failed to fetch featured recipes");
+    } catch (error) {
+      console.error("Error fetching featured recipes:", error);
+      throw new Error("Failed to fetch featured recipes. Please check your database connection.");
     }
   }
 );
