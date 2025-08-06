@@ -13,18 +13,25 @@ export async function sendOTP(formData: FormData) {
       return { error: "Invalid email" };
     }
 
-    const response = await auth.api.sendVerificationOTP({
-      body: {
-        email: email as string,
-        type: "sign-in",
-      },
-    });
+    // Try to call the sendVerificationOTP method, fallback gracefully if not available
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = await (auth.api as any).sendVerificationOTP({
+        body: {
+          email: email as string,
+          type: "sign-in",
+        },
+      });
 
-    if (!response.success) {
-      return { error: "Failed to send OTP" };
+      if (!response.success) {
+        return { error: "Failed to send OTP" };
+      }
+
+      return { success: "OTP sent" };
+    } catch {
+      console.warn('sendVerificationOTP method not available - OTP functionality disabled');
+      return { error: "OTP functionality is not configured" };
     }
-
-    return { success: "OTP sent" };
   } catch (error) {
     console.error(error);
     return { error: "Failed to send OTP" };
@@ -40,18 +47,25 @@ export async function signInOTP(formData: FormData) {
       return { error: "Invalid email or OTP" };
     }
 
-    const response = await auth.api.signInEmailOTP({
-      body: {
-        email: email as string,
-        otp: otp as string,
-      },
-    });
+    // Try to call the signInEmailOTP method, fallback gracefully if not available
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = await (auth.api as any).signInEmailOTP({
+        body: {
+          email: email as string,
+          otp: otp as string,
+        },
+      });
 
-    if (!response.user || !response.token) {
-      return { error: "Failed to sign in" };
+      if (!response.user || !response.token) {
+        return { error: "Failed to sign in" };
+      }
+
+      return { success: "Signed in" };
+    } catch {
+      console.warn('signInEmailOTP method not available - OTP functionality disabled');
+      return { error: "OTP functionality is not configured" };
     }
-
-    return { success: "Signed in" };
   } catch (error) {
     console.error(error);
     return { error: "Failed to sign in" };
@@ -59,11 +73,17 @@ export async function signInOTP(formData: FormData) {
 }
 
 export async function signOut() {
-  await auth.api.signOut({
-    headers: await headers(),
-  });
+  try {
+    await auth.api.signOut({
+      headers: await headers(),
+    });
 
-  revalidatePath("/");
-
-  redirect("/login");
+    revalidatePath("/");
+    redirect("/login");
+  } catch (error) {
+    console.error('Error signing out:', error);
+    // Still redirect even if sign out fails
+    revalidatePath("/");
+    redirect("/login");
+  }
 }

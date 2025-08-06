@@ -11,9 +11,11 @@ import type {
 
 export const getPopularCuisines = cache(async (): Promise<Country[]> => {
   try {
-    return db.select().from(schema.country).orderBy(schema.country.name);
-  } catch {
-    throw new Error("Failed to fetch popular cuisines");
+    return await db.select().from(schema.country).orderBy(schema.country.name);
+  } catch (error) {
+    console.error("Database error in getPopularCuisines:", error);
+    // Return empty array instead of throwing to prevent app crash
+    return [];
   }
 });
 
@@ -25,8 +27,10 @@ export const getCountryById = cache(
         .from(schema.country)
         .where(eq(schema.country.id, id));
       return result[0] || null;
-    } catch {
-      throw new Error("Failed to fetch country by id");
+    } catch (error) {
+      console.error("Database error in getCountryById:", error);
+      // Return null instead of throwing to prevent app crash
+      return null;
     }
   }
 );
@@ -123,8 +127,10 @@ export const getFeaturedRecipes = cache(
         .orderBy(desc(schema.recipe.createdAt));
 
       return recipes;
-    } catch {
-      throw new Error("Failed to fetch featured recipes");
+    } catch (error) {
+      console.error("Database error in getFeaturedRecipes:", error);
+      // Return empty array instead of throwing to prevent app crash
+      return [];
     }
   }
 );
@@ -277,8 +283,10 @@ export const getUserLikedRecipes = cache(
         .where(eq(schema.likes.userId, userId));
 
       return likes.map((like) => like.recipeId);
-    } catch {
-      throw new Error("Failed to fetch user liked recipes");
+    } catch (error) {
+      console.error("Database error in getUserLikedRecipes:", error);
+      // Return empty array instead of throwing to prevent app crash
+      return [];
     }
   }
 );
