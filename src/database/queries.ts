@@ -1,6 +1,6 @@
 import { db } from "./drizzle";
 import * as schema from "./schema";
-import { desc, eq, count, ilike } from "drizzle-orm";
+import { desc, eq, count, ilike, notInArray, and } from "drizzle-orm";
 import { cache } from "react";
 import type {
   Country,
@@ -36,6 +36,7 @@ export const getAllRecipes = cache(
     limit = 12,
     offset = 0,
     countrySlug,
+    excludeIds,
   }: RecipeQueryOptions = {}): Promise<RecipeWithCountry[]> => {
     try {
       const query = db
@@ -67,8 +68,18 @@ export const getAllRecipes = cache(
         .limit(limit)
         .offset(offset);
 
+      const conditions = [];
+      
       if (countrySlug) {
-        query.where(eq(schema.country.slug, countrySlug));
+        conditions.push(eq(schema.country.slug, countrySlug));
+      }
+
+      if (excludeIds && excludeIds.length > 0) {
+        conditions.push(notInArray(schema.recipe.id, excludeIds));
+      }
+
+      if (conditions.length > 0) {
+        query.where(and(...conditions));
       }
 
       return query;

@@ -7,6 +7,7 @@ import {
   getRecipeBySlug,
   getAllRecipes,
   getReviewsByRecipeId,
+  getCountryById,
 } from "@/database/queries";
 import BackButton from "@/components/recipes/back-button";
 import { auth } from "@/lib/auth";
@@ -47,9 +48,12 @@ export default async function RecipePage({ params }: { params: Params }) {
   });
   const userId = session?.user?.id;
 
+  // Get country to find related recipes
+  const country = await getCountryById(recipe.countryId);
+  
   // Get related recipes
   const relatedRecipes = await getAllRecipes({ 
-    countrySlug: recipe.countrySlug,
+    countrySlug: country?.slug,
     limit: 4,
     excludeIds: [recipe.id],
   });

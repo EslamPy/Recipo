@@ -7,13 +7,7 @@ import { ChefHat, Globe, ArrowRight, UtensilsCrossed } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
-// Food items that will float in the background
-const foodItems = [
-  { src: "/images/food-1.png", alt: "Food item 1" },
-  { src: "/images/food-2.png", alt: "Food item 2" },
-  { src: "/images/food-3.png", alt: "Food item 3" },
-  { src: "/images/food-4.png", alt: "Food item 4" },
-];
+
 
 // Predefined values for floating icons to prevent hydration mismatch
 const floatingIcons = [

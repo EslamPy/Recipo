@@ -53,7 +53,7 @@ export default function TermsOfService() {
             
             <h2>User Content</h2>
             <p>
-              Our services may allow you to upload, submit, store, send, or receive content such as recipes, photos, or comments ("User Content"). You retain ownership rights in your User Content. By submitting User Content, you grant Recipo a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, publish, and distribute such content for the purposes of operating and providing our services.
+              Our services may allow you to upload, submit, store, send, or receive content such as recipes, photos, or comments (&quot;User Content&quot;). You retain ownership rights in your User Content. By submitting User Content, you grant Recipo a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, publish, and distribute such content for the purposes of operating and providing our services.
             </p>
             
             <h2>Prohibited Activities</h2>
@@ -79,7 +79,7 @@ export default function TermsOfService() {
             
             <h2>Disclaimer of Warranties</h2>
             <p>
-              Our services are provided "as is" without any warranties, either express or implied. We do not warrant that our services will be uninterrupted, timely, secure, or error-free.
+              Our services are provided &quot;as is&quot; without any warranties, either express or implied. We do not warrant that our services will be uninterrupted, timely, secure, or error-free.
             </p>
             
             <h2>Limitation of Liability</h2>
