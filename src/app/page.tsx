@@ -9,6 +9,9 @@ import {
 } from "@/components/home/featured-recipes";
 import { Newsletter } from "@/components/home/newsletter";
 
+// Prevent static generation during build
+export const dynamic = 'force-dynamic'
+
 import {
   getFeaturedRecipes,
   getPopularCuisines,

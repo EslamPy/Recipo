@@ -6,6 +6,9 @@ import RecipesPagination from "@/components/recipes/recipes-pagination";
 import { getAllRecipes, getRecipesCount } from "@/database/queries";
 import { Suspense } from "react";
 
+// Prevent static generation during build
+export const dynamic = 'force-dynamic'
+
 const RECIPES_PER_PAGE = 12;
 
 async function RecipesListSection({

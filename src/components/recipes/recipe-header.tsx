@@ -4,7 +4,6 @@ import Image from "next/image";
 import { Globe, ChefHat, Clock, Utensils, Flame, Heart, Share2, Bookmark, Star } from "lucide-react";
 import { RecipeWithCountry } from "@/types/recipe";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { likeRecipe } from "@/actions/recipe";
 import { useState, useOptimistic, startTransition } from "react";
 
