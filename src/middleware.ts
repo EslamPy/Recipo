@@ -13,6 +13,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  const isAdmin = session?.user?.role === "admin";
+
   return NextResponse.next();
 }
 

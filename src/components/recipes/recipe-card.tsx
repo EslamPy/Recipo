@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Clock, ChefHat, Globe, Heart, Star, Utensils } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { RecipeWithCountry } from "@/types/recipe";
-import { useOptimistic, startTransition } from "react";
+import { useOptimistic, startTransition, useState, useEffect } from "react";
 import { likeRecipe } from "@/actions/recipe";
 import { Button } from "../ui/button";
 import { motion } from "framer-motion";
@@ -31,6 +31,11 @@ export default function RecipeCard({
   };
 
   const [optimisticLike, setOptimisticLike] = useOptimistic(isLiked);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   async function handleLike(e: React.MouseEvent) {
     e.preventDefault();
@@ -43,13 +48,36 @@ export default function RecipeCard({
     await likeRecipe(recipe.id);
   }
 
-  // Random rating for demo purposes
-  const rating = ((Math.random() * 2) + 3).toFixed(1);
+  // Generate a deterministic rating based on recipe id instead of random
+  const getStableRating = () => {
+    // Use the last character of the ID as a seed
+    const seed = recipe.id.charCodeAt(recipe.id.length - 1) % 10;
+    // Generate a number between 3.5 and 5.0
+    return (3.5 + (seed / 10) * 1.5).toFixed(1);
+  };
+  
+  // Generate a stable value for featured status
+  const isRecipeFeatured = () => {
+    // Use a character from the middle of the ID to determine featured status
+    const midChar = recipe.id.charCodeAt(Math.floor(recipe.id.length / 2)) % 10;
+    return midChar > 7; // About 30% of recipes will be featured
+  };
+  
+  // Generate a stable number of ingredients
+  const getIngredientCount = () => {
+    // Use another character from the ID to determine ingredient count
+    const startChar = recipe.id.charCodeAt(0) % 10;
+    return 2 + startChar;
+  };
+  
+  const rating = getStableRating();
+  const featured = isRecipeFeatured();
+  const ingredientCount = getIngredientCount();
 
   return (
     <div className="group relative bg-white dark:bg-gray-800/80 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-gray-100 dark:border-gray-700/50 hover:border-amber-200 dark:hover:border-amber-700/70 duration-300 flex flex-col h-[420px]">
       {/* Featured badge */}
-      {Math.random() > 0.7 && (
+      {featured && (
         <div className="absolute top-0 left-0 w-28 h-28 overflow-hidden z-20">
           <div className="absolute top-[19px] left-[-50px] w-[170px] transform -rotate-45 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold py-1 text-center shadow-md">
             Featured
@@ -142,7 +170,7 @@ export default function RecipeCard({
                 
                 <div className="flex items-center text-xs text-gray-600 dark:text-gray-300 font-medium">
                   <Utensils className="h-3.5 w-3.5 mr-1.5 text-amber-500" />
-                  <span>{Math.floor(Math.random() * 10) + 2} ingredients</span>
+                  <span>{ingredientCount} ingredients</span>
                 </div>
               </div>
 

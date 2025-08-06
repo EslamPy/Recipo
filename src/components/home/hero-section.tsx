@@ -15,6 +15,18 @@ const foodItems = [
   { src: "/images/food-4.png", alt: "Food item 4" },
 ];
 
+// Predefined values for floating icons to prevent hydration mismatch
+const floatingIcons = [
+  { x: "10%", y: "20%", scale: 0.6, rotate: 120, duration: 20, delay: 0, size: 30 },
+  { x: "80%", y: "15%", scale: 0.8, rotate: 240, duration: 25, delay: 2, size: 25 },
+  { x: "30%", y: "75%", scale: 0.5, rotate: 180, duration: 22, delay: 1, size: 35 },
+  { x: "70%", y: "60%", scale: 0.7, rotate: 90, duration: 18, delay: 3, size: 28 },
+  { x: "20%", y: "40%", scale: 0.9, rotate: 360, duration: 30, delay: 1.5, size: 22 },
+  { x: "60%", y: "85%", scale: 0.6, rotate: -120, duration: 24, delay: 2.5, size: 32 },
+  { x: "40%", y: "10%", scale: 0.7, rotate: -240, duration: 28, delay: 0.5, size: 26 },
+  { x: "90%", y: "50%", scale: 0.5, rotate: -180, duration: 21, delay: 4, size: 29 },
+];
+
 export function HeroSection() {
   const [loaded, setLoaded] = useState(false);
   
@@ -59,30 +71,30 @@ export function HeroSection() {
         <AnimatePresence>
           {loaded && (
             <>
-              {[...Array(8)].map((_, index) => (
+              {floatingIcons.map((icon, index) => (
                 <motion.div
                   key={index}
                   className="absolute"
                   initial={{ 
-                    x: Math.random() * 100 - 50 + "%", 
-                    y: Math.random() * 100 + "%",
+                    x: icon.x, 
+                    y: icon.y,
                     opacity: 0,
-                    scale: 0.3 + Math.random() * 0.7,
-                    rotate: Math.random() * 360 
+                    scale: icon.scale,
+                    rotate: icon.rotate 
                   }}
                   animate={{ 
                     y: [null, "-100%"],
                     opacity: [0, 0.4, 0],
-                    rotate: Math.random() > 0.5 ? 360 : -360
+                    rotate: index % 2 === 0 ? 360 : -360
                   }}
                   transition={{ 
-                    duration: 15 + Math.random() * 20,
+                    duration: icon.duration,
                     ease: "linear",
                     repeat: Infinity,
-                    delay: Math.random() * 5
+                    delay: icon.delay
                   }}
                 >
-                  <UtensilsCrossed className="text-amber-200" size={20 + Math.random() * 30} />
+                  <UtensilsCrossed className="text-amber-200" size={icon.size} />
                 </motion.div>
               ))}
             </>
@@ -96,7 +108,7 @@ export function HeroSection() {
             className="space-y-8 w-full lg:w-1/2"
             variants={containerVariants}
             initial="hidden"
-            animate="show"
+            animate="show" 
           >
             <motion.div 
               variants={itemVariants}
@@ -123,8 +135,7 @@ export function HeroSection() {
 
             <motion.p 
               variants={itemVariants}
-              className="text-lg text-gray-600 dark:text-gray-300 max-w-lg"
-            >
+              className="text-lg text-gray-600 dark:text-gray-300 max-w-lg" >
               Embark on a culinary journey across continents, exploring the rich
               tapestry of global flavors. Discover authentic recipes passed down
               through generations, from the spicy streets of Bangkok to the rustic

@@ -2,13 +2,29 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 import { Mail, SendHorizonal, CheckCircle2 } from "lucide-react";
+
+// Pre-defined bubble configurations to avoid hydration mismatch
+const bubbles = [
+  { height: 45, width: 60, top: 15, left: 20, duration: 18, delay: 0 },
+  { height: 70, width: 50, top: 45, left: 80, duration: 15, delay: 2 },
+  { height: 30, width: 40, top: 75, left: 40, duration: 22, delay: 1 },
+  { height: 50, width: 60, top: 30, left: 65, duration: 18, delay: 3 },
+  { height: 60, width: 70, top: 60, left: 10, duration: 20, delay: 1.5 },
+  { height: 35, width: 45, top: 85, left: 75, duration: 24, delay: 0.5 },
+];
 
 export function Newsletter() {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Set isClient to true after component mounts to enable animations
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,25 +47,26 @@ export function Newsletter() {
         aria-hidden="true"
       />
       
+      {/* Only render animated bubbles on the client side */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(6)].map((_, i) => (
+        {isClient && bubbles.map((bubble, i) => (
           <motion.div
             key={i}
             className="absolute bg-amber-100 dark:bg-amber-900/20 rounded-full opacity-40 dark:opacity-20"
             style={{
-              height: `${30 + Math.random() * 70}px`,
-              width: `${30 + Math.random() * 70}px`,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
+              height: `${bubble.height}px`,
+              width: `${bubble.width}px`,
+              top: `${bubble.top}%`,
+              left: `${bubble.left}%`,
             }}
             animate={{
               y: [0, -100],
               opacity: [0.4, 0],
             }}
             transition={{
-              duration: 10 + Math.random() * 15,
+              duration: bubble.duration,
               repeat: Infinity,
-              delay: Math.random() * 5,
+              delay: bubble.delay,
               ease: "linear",
             }}
           />
@@ -60,7 +77,7 @@ export function Newsletter() {
         <motion.div
           className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 md:p-12 border border-gray-100 dark:border-gray-700"
           initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ 
             duration: 0.6, 
