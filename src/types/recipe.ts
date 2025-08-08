@@ -13,6 +13,7 @@ export interface RecipeQueryOptions {
   limit?: number;
   offset?: number;
   countrySlug?: string;
+  excludeIds?: string[];
 }
 
 export type User = InferSelectModel<typeof schema.user>;

@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ReviewWithUserName } from "@/types/recipe";
 import { useComment } from "@/hooks/use-comment";
 import { formatDate } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import { MessageSquare } from "lucide-react";
 
 interface CommentSectionProps {
   initialComments?: ReviewWithUserName[];
@@ -33,27 +35,42 @@ export function CommentSection({
   } = useComment({ initialComments, recipeId, userId, recipeSlug });
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 mt-8">
-      <h3 className="text-xl font-semibold mb-6">Comments</h3>
+    <motion.div 
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.3 }}
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mt-8 border border-gray-100 dark:border-gray-700"
+    >
+      <div className="flex items-center mb-6 pb-2 border-b border-gray-200 dark:border-gray-700">
+        <div className="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-full mr-3">
+          <MessageSquare className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+        </div>
+        <h3 className="text-xl font-semibold">Reviews & Comments</h3>
+      </div>
 
       {/* Comment input */}
-      <div className="flex gap-4 mb-8">
-        <Avatar className="h-10 w-10">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="flex gap-4 mb-8"
+      >
+        <Avatar className="h-12 w-12">
           <AvatarImage src="" alt="Your profile" />
-          <AvatarFallback className="bg-primary/10 text-primary">
+          <AvatarFallback className="bg-amber-100 text-amber-600 text-sm font-medium">
             YO
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1 space-y-4">
+        <div className="flex-1 space-y-4 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl">
           {/* Rating stars */}
           <div className="flex flex-col space-y-2">
-            <div className="flex items-center">
-              <span className="text-sm font-medium text-gray-700 mr-3">
+            <div className="flex items-center flex-wrap gap-2">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Rate this recipe:
               </span>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <button
+                  <motion.button
                     key={star}
                     type="button"
                     onClick={() => setRating(star)}
@@ -61,6 +78,8 @@ export function CommentSection({
                     onMouseLeave={() => setHoveredRating(0)}
                     className="focus:outline-none transition duration-150"
                     aria-label={`Rate ${star} stars`}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
                   >
                     <StarIcon
                       filled={(hoveredRating || rating) >= star}
@@ -70,28 +89,32 @@ export function CommentSection({
                           : "text-gray-300"
                       }`}
                     />
-                  </button>
+                  </motion.button>
                 ))}
               </div>
               {rating > 0 && (
-                <span className="ml-3 text-sm text-gray-500">
+                <motion.span 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="ml-3 text-sm text-amber-600 dark:text-amber-400 font-medium"
+                >
                   {rating === 5
-                    ? "Excellent!"
+                    ? "Excellent! 👏"
                     : rating === 4
-                    ? "Very good"
+                    ? "Very good 👍"
                     : rating === 3
-                    ? "Good"
+                    ? "Good 😊"
                     : rating === 2
-                    ? "Fair"
-                    : "Poor"}
-                </span>
+                    ? "Fair 🙂"
+                    : "Needs improvement 🤔"}
+                </motion.span>
               )}
             </div>
           </div>
 
           <Textarea
             placeholder="Share your thoughts on this recipe..."
-            className="resize-none min-h-[80px]"
+            className="resize-none min-h-[100px] bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
           />
@@ -99,57 +122,77 @@ export function CommentSection({
             <Button
               onClick={handleAddComment}
               disabled={!commentText.trim() || isLoading}
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700"
             >
               {isLoading ? "Posting..." : "Post Comment"}
             </Button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Comments list */}
-      {comments.length > 0 ? (
-        <div className="space-y-6">
-          {comments.map((comment) => (
-            <div key={comment.id} className="flex gap-4 group">
-              <Avatar className="h-10 w-10">
-                <AvatarImage alt={comment.userName || "Unknown User"} />
-                <AvatarFallback className="bg-secondary/80">
-                  {comment.userName?.substring(0, 2).toUpperCase() || "Un"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-medium">{comment.userName}</h4>
-                  <span className="text-muted-foreground text-sm">
-                    {formatDate(comment.createdAt.toISOString())}
-                  </span>
-                </div>
-                {comment.rating && (
-                  <div className="flex mt-1 mb-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <StarIcon
-                        key={star}
-                        filled={comment.rating! >= star}
-                        className={`w-4 h-4 ${
-                          comment.rating! >= star
-                            ? "text-amber-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
+      <AnimatePresence>
+        {comments.length > 0 ? (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="space-y-6"
+          >
+            {comments.map((comment, index) => (
+              <motion.div 
+                key={comment.id} 
+                className="flex gap-4 group bg-gray-50 dark:bg-gray-900/30 p-4 rounded-xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 + 0.5 }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              >
+                <Avatar className="h-10 w-10">
+                  <AvatarImage alt={comment.userName || "Unknown User"} />
+                  <AvatarFallback className="bg-amber-100 text-amber-600 text-sm font-medium">
+                    {comment.userName?.substring(0, 2).toUpperCase() || "Un"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-medium">{comment.userName}</h4>
+                    <span className="text-muted-foreground text-sm">
+                      {formatDate(comment.createdAt.toISOString())}
+                    </span>
                   </div>
-                )}
-                <p className="mt-1 text-gray-700">{comment.comment}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-8 text-muted-foreground">
-          <p>Be the first to comment on this recipe!</p>
-        </div>
-      )}
-    </div>
+                  {comment.rating && (
+                    <div className="flex mt-1 mb-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <StarIcon
+                          key={star}
+                          filled={comment.rating! >= star}
+                          className={`w-4 h-4 ${
+                            comment.rating! >= star
+                              ? "text-amber-400"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <p className="mt-1 text-gray-700 dark:text-gray-300">{comment.comment}</p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="text-center py-12 text-muted-foreground bg-gray-50 dark:bg-gray-900/30 rounded-xl"
+          >
+            <p>Be the first to comment on this recipe!</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 
