@@ -22,7 +22,8 @@ export async function createRecipe(input: RecipeInsert) {
     headers: await headers(),
   });
 
-  if (!session?.session && session?.user?.role !== "admin") {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (!session?.session || (session?.user as any)?.role !== "admin") {
     throw new Error("Unauthorized");
   }
 
@@ -63,7 +64,8 @@ export async function updateRecipe(input: RecipeInsert) {
     headers: await headers(),
   });
 
-  if (!session?.session && session?.user?.role !== "admin") {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (!session?.session || (session?.user as any)?.role !== "admin") {
     throw new Error("Unauthorized");
   }
 
@@ -110,7 +112,8 @@ export async function deleteRecipe(id: string) {
     headers: await headers(),
   });
 
-  if (!session?.session && session?.user?.role !== "admin") {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (!session?.session || (session?.user as any)?.role !== "admin") {
     throw new Error("Unauthorized");
   }
 

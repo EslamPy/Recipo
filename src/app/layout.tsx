@@ -47,7 +47,8 @@ export default async function RootLayout({
     headers: await headers(),
   });
   const isLoggedIn = !!session;
-  const isAdmin = session?.user?.role === "admin";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isAdmin = (session?.user as any)?.role === "admin";
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased min-h-screen flex flex-col">

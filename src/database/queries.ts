@@ -1,19 +1,21 @@
 import { db } from "./drizzle";
 import * as schema from "./schema";
-import { desc, eq, count, ilike } from "drizzle-orm";
+import { desc, eq, count, ilike, not, inArray, and } from "drizzle-orm";
 import { cache } from "react";
 import type {
   Country,
-  RecipeQueryOptions,
   RecipeWithCountry,
+  RecipeQueryOptions,
   ReviewWithUserName,
 } from "@/types/recipe";
 
 export const getPopularCuisines = cache(async (): Promise<Country[]> => {
   try {
-    return db.select().from(schema.country).orderBy(schema.country.name);
-  } catch {
-    throw new Error("Failed to fetch popular cuisines");
+    return await db.select().from(schema.country).orderBy(schema.country.name);
+  } catch (error) {
+    console.error("Database error in getPopularCuisines:", error);
+    // Return empty array instead of throwing to prevent app crash
+    return [];
   }
 });
 
@@ -25,8 +27,10 @@ export const getCountryById = cache(
         .from(schema.country)
         .where(eq(schema.country.id, id));
       return result[0] || null;
-    } catch {
-      throw new Error("Failed to fetch country by id");
+    } catch (error) {
+      console.error("Database error in getCountryById:", error);
+      // Return null instead of throwing to prevent app crash
+      return null;
     }
   }
 );
@@ -36,6 +40,7 @@ export const getAllRecipes = cache(
     limit = 12,
     offset = 0,
     countrySlug,
+    excludeIds,
   }: RecipeQueryOptions = {}): Promise<RecipeWithCountry[]> => {
     try {
       const query = db
@@ -57,6 +62,7 @@ export const getAllRecipes = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(
@@ -67,8 +73,18 @@ export const getAllRecipes = cache(
         .limit(limit)
         .offset(offset);
 
+      const conditions = [];
+      
       if (countrySlug) {
-        query.where(eq(schema.country.slug, countrySlug));
+        conditions.push(eq(schema.country.slug, countrySlug));
+      }
+      
+      if (excludeIds && excludeIds.length > 0) {
+        conditions.push(not(inArray(schema.recipe.id, excludeIds)));
+      }
+      
+      if (conditions.length > 0) {
+        query.where(and(...conditions));
       }
 
       return query;
@@ -100,6 +116,7 @@ export const getFeaturedRecipes = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(
@@ -110,8 +127,10 @@ export const getFeaturedRecipes = cache(
         .orderBy(desc(schema.recipe.createdAt));
 
       return recipes;
-    } catch {
-      throw new Error("Failed to fetch featured recipes");
+    } catch (error) {
+      console.error("Database error in getFeaturedRecipes:", error);
+      // Return empty array instead of throwing to prevent app crash
+      return [];
     }
   }
 );
@@ -138,6 +157,7 @@ export const getRecipeBySlug = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(
@@ -178,6 +198,7 @@ export const getRecipesByCountry = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(
@@ -216,6 +237,7 @@ export const getRecipesBySearch = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(
@@ -261,8 +283,10 @@ export const getUserLikedRecipes = cache(
         .where(eq(schema.likes.userId, userId));
 
       return likes.map((like) => like.recipeId);
-    } catch {
-      throw new Error("Failed to fetch user liked recipes");
+    } catch (error) {
+      console.error("Database error in getUserLikedRecipes:", error);
+      // Return empty array instead of throwing to prevent app crash
+      return [];
     }
   }
 );
@@ -289,6 +313,7 @@ export const getFavoriteRecipes = cache(
           createdAt: schema.recipe.createdAt,
           updatedAt: schema.recipe.updatedAt,
           countryName: schema.country.name,
+          countrySlug: schema.country.slug,
         })
         .from(schema.recipe)
         .innerJoin(schema.likes, eq(schema.recipe.id, schema.likes.recipeId))

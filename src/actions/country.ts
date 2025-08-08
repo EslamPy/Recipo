@@ -26,7 +26,8 @@ export async function createCountry(input: CountryInsert): Promise<{
       headers: await headers(),
     });
 
-    if (!session?.session && session?.user?.role !== "admin") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session?.session || (session?.user as any)?.role !== "admin") {
       return {
         error: "Unauthorized. You must be an admin to perform this action.",
       };
@@ -64,7 +65,8 @@ export async function updateCountry(input: CountryInsert): Promise<{
       headers: await headers(),
     });
 
-    if (!session?.session && session?.user?.role !== "admin") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session?.session || (session?.user as any)?.role !== "admin") {
       return {
         error: "Unauthorized. You must be an admin to perform this action.",
       };
@@ -93,7 +95,8 @@ export async function deleteCountry(id: string) {
       headers: await headers(),
     });
 
-    if (!session?.session && session?.user?.role !== "admin") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session?.session || (session?.user as any)?.role !== "admin") {
       return {
         error: "Unauthorized. You must be an admin to perform this action.",
       };

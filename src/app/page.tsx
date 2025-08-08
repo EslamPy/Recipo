@@ -9,6 +9,9 @@ import {
 } from "@/components/home/featured-recipes";
 import { Newsletter } from "@/components/home/newsletter";
 
+// Prevent static generation during build
+export const dynamic = 'force-dynamic'
+
 import {
   getFeaturedRecipes,
   getPopularCuisines,
@@ -42,9 +45,16 @@ async function FeaturedRecipesSection() {
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-amber-50/80 to-white">
       <HeroSection />
-      <div className="px-4 md:px-16">
+      
+      <div className="relative">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-16 bg-gradient-to-b from-amber-50/80 to-transparent pointer-events-none"></div>
+        <div className="absolute -top-8 left-1/4 w-16 h-16 rounded-full bg-amber-200/30 blur-xl"></div>
+        <div className="absolute top-40 right-1/3 w-24 h-24 rounded-full bg-orange-200/20 blur-xl"></div>
+        <div className="absolute top-96 left-1/2 w-32 h-32 rounded-full bg-amber-100/30 blur-xl"></div>
+        
         <Suspense fallback={<PopularCuisinesSkeleton />}>
           <PopularCuisinesSection />
         </Suspense>
@@ -53,6 +63,7 @@ export default function Home() {
           <FeaturedRecipesSection />
         </Suspense>
       </div>
+      
       <Newsletter />
     </div>
   );

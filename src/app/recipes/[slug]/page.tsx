@@ -11,8 +11,17 @@ import {
 import BackButton from "@/components/recipes/back-button";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import RecipeRelated from "@/components/recipes/recipe-related";
 
 type Params = Promise<{ slug: string }>;
+
+// Prevent static generation during build
+export const dynamic = 'force-dynamic'
+
+// Prevent static params generation during build
+export async function generateStaticParams() {
+  return []
+}
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
@@ -20,15 +29,8 @@ export async function generateMetadata({ params }: { params: Params }) {
 
   return {
     title: recipe?.title,
+    description: recipe?.description,
   };
-}
-
-export async function generateStaticParams() {
-  const recipes = await getAllRecipes({ limit: 100 });
-
-  return recipes.map((recipe) => ({
-    slug: recipe.slug,
-  }));
 }
 
 export default async function RecipePage({ params }: { params: Params }) {
@@ -45,22 +47,29 @@ export default async function RecipePage({ params }: { params: Params }) {
   });
   const userId = session?.user?.id;
 
+  // Get related recipes
+  const relatedRecipes = await getAllRecipes({ 
+    countrySlug: recipe.countrySlug,
+    limit: 4,
+    excludeIds: [recipe.id],
+  });
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-white pt-8 pb-16">
+      <div className="container mx-auto px-4 max-w-7xl">
         <BackButton title="Recipes" />
 
         {/* Recipe Header */}
         <RecipeHeader recipe={recipe} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           {/* Ingredients */}
-          <div className="w-90 lg:col-span-1">
+          <div className="lg:col-span-1 order-2 lg:order-1">
             <RecipeIngredients ingredients={recipe.ingredients as string[]} />
           </div>
 
           {/* Instructions */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-1 lg:order-2">
             <RecipeInstructions
               instructions={recipe.instructions as string[]}
               videoUrl={recipe.videoUrl as string}
@@ -69,12 +78,20 @@ export default async function RecipePage({ params }: { params: Params }) {
           </div>
         </div>
 
+        {/* Comments Section */}
         <CommentSection
           initialComments={reviews}
           recipeId={recipe.id}
           userId={userId || ""}
           recipeSlug={recipe.slug}
         />
+        
+        {/* Related Recipes */}
+        {relatedRecipes.length > 0 && (
+          <div className="mt-16">
+            <RecipeRelated recipes={relatedRecipes} country={recipe.countryName} />
+          </div>
+        )}
       </div>
     </div>
   );
