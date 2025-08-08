@@ -3,10 +3,37 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChefHat, Globe, ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { ChefHat, Globe, ArrowRight, UtensilsCrossed } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+
+// Food items that will float in the background
+// const foodItems = [
+//   { src: "/images/food-1.png", alt: "Food item 1" },
+//   { src: "/images/food-2.png", alt: "Food item 2" },
+//   { src: "/images/food-3.png", alt: "Food item 3" },
+//   { src: "/images/food-4.png", alt: "Food item 4" },
+// ];
+
+// Predefined values for floating icons to prevent hydration mismatch
+const floatingIcons = [
+  { x: "10%", y: "20%", scale: 0.6, rotate: 120, duration: 20, delay: 0, size: 30 },
+  { x: "80%", y: "15%", scale: 0.8, rotate: 240, duration: 25, delay: 2, size: 25 },
+  { x: "30%", y: "75%", scale: 0.5, rotate: 180, duration: 22, delay: 1, size: 35 },
+  { x: "70%", y: "60%", scale: 0.7, rotate: 90, duration: 18, delay: 3, size: 28 },
+  { x: "20%", y: "40%", scale: 0.9, rotate: 360, duration: 30, delay: 1.5, size: 22 },
+  { x: "60%", y: "85%", scale: 0.6, rotate: -120, duration: 24, delay: 2.5, size: 32 },
+  { x: "40%", y: "10%", scale: 0.7, rotate: -240, duration: 28, delay: 0.5, size: 26 },
+  { x: "90%", y: "50%", scale: 0.5, rotate: -180, duration: 21, delay: 4, size: 29 },
+];
 
 export function HeroSection() {
+  const [loaded, setLoaded] = useState(false);
+  
+  useEffect(() => {
+    setLoaded(true);
+  }, []);
+
   // Function to handle smooth scrolling
   const handleScrollToCountries = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -20,82 +47,199 @@ export function HeroSection() {
     }
   };
 
+  // Animation variants for staggered children
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } },
+  };
+
   return (
-    <section className="pb-20 pt-10 bg-gradient-to-b from-amber-100 via-amber-50/80 to-white">
-      <div className="flex flex-col lg:flex-row gap-8 items-center justify-center px-30">
-        <motion.div
-          className="space-y-8 w-full lg:w-1/2"
-          initial={{ x: -50, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="flex items-center px-2 gap-2 rounded-full bg-amber-100/80 w-fit">
-            <div className="rounded-full bg-amber-500 w-2 h-2 animate-pulse"></div>
-            <span className="text-amber-700 dark:text-amber-300 text-sm font-medium">
-              World Cuisine Explorer
-            </span>
-          </div>
-
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-            Taste the World&apos;s
-            <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-500 dark:from-amber-400 dark:to-orange-300">
-              Finest Recipes
-            </span>
-          </h1>
-
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-lg">
-            Embark on a culinary journey across continents, exploring the rich
-            tapestry of global flavors. Discover authentic recipes passed down
-            through generations, from the spicy streets of Bangkok to the rustic
-            kitchens of Tuscany. Our curated collection brings the world&apos;s
-            most beloved dishes right to your kitchen - all in one place.
-          </p>
-
-          <div className="flex flex-wrap gap-4">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 rounded-full px-6 shadow-md hover:shadow-lg transition-all"
-              asChild
-            >
-              <Link href="/recipes" className="flex items-center">
-                <ChefHat className="h-5 w-5 mr-2" />
-                Explore Recipes
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="rounded-full border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 px-6 transition-all"
-              asChild
-            >
-              <Link
-                href="#countries-section"
-                onClick={handleScrollToCountries}
-                className="flex items-center"
-              >
-                <Globe className="h-5 w-5 mr-2" />
-                Discover Countries
-              </Link>
-            </Button>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ x: 50, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <Image
-            src="/images/hero-food.png"
-            alt="Delicious world cuisine"
-            priority
-            width={600}
-            height={600}
-            className="object-cover animate-spin duration-20000"
-          />
-        </motion.div>
+    <section className="relative py-20 pt-20 overflow-hidden bg-gradient-to-b from-amber-100 via-amber-50/80 to-white">
+      {/* Floating food icons */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <AnimatePresence>
+          {loaded && (
+            <>
+              {floatingIcons.map((icon, index) => (
+                <motion.div
+                  key={index}
+                  className="absolute"
+                  initial={{ 
+                    x: icon.x, 
+                    y: icon.y,
+                    opacity: 0,
+                    scale: icon.scale,
+                    rotate: icon.rotate 
+                  }}
+                  animate={{ 
+                    y: [null, "-100%"],
+                    opacity: [0, 0.4, 0],
+                    rotate: index % 2 === 0 ? 360 : -360
+                  }}
+                  transition={{ 
+                    duration: icon.duration,
+                    ease: "linear",
+                    repeat: Infinity,
+                    delay: icon.delay
+                  }}
+                >
+                  <UtensilsCrossed className="text-amber-200" size={icon.size} />
+                </motion.div>
+              ))}
+            </>
+          )}
+        </AnimatePresence>
       </div>
+      
+      <div className="container mx-auto px-4 z-10 relative">
+        <div className="flex flex-col lg:flex-row gap-12 items-center justify-between">
+          <motion.div
+            className="space-y-8 w-full lg:w-1/2"
+            variants={containerVariants}
+            initial="hidden"
+            animate="show" 
+          >
+            <motion.div 
+              variants={itemVariants}
+              className="flex items-center px-3 py-1.5 gap-2 rounded-full bg-amber-100/80 w-fit border border-amber-200/50 shadow-sm"
+            >
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-amber-500 animate-ping opacity-70"></div>
+                <div className="relative rounded-full bg-amber-500 w-2 h-2"></div>
+              </div>
+              <span className="text-amber-700 dark:text-amber-300 text-sm font-medium">
+                World Cuisine Explorer
+              </span>
+            </motion.div>
+
+            <motion.h1 
+              variants={itemVariants}
+              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight"
+            >
+              Taste the World&apos;s
+              <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-500 dark:from-amber-400 dark:to-orange-300">
+                Finest Recipes
+              </span>
+            </motion.h1>
+
+            <motion.p 
+              variants={itemVariants}
+              className="text-lg text-gray-600 dark:text-gray-300 max-w-lg" >
+              Embark on a culinary journey across continents, exploring the rich
+              tapestry of global flavors. Discover authentic recipes passed down
+              through generations, from the spicy streets of Bangkok to the rustic
+              kitchens of Tuscany.
+            </motion.p>
+
+            <motion.div 
+              variants={itemVariants}
+              className="flex flex-wrap gap-4"
+            >
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 rounded-full px-6 shadow-md hover:shadow-lg transition-all"
+                asChild
+              >
+                <Link href="/recipes" className="flex items-center group">
+                  <ChefHat className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform" />
+                  <span>Explore Recipes</span>
+                  <motion.div
+                    className="ml-2"
+                    initial={{ x: 0 }}
+                    whileHover={{ x: 5 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </motion.div>
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-full border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 px-6 transition-all"
+                asChild
+              >
+                <Link
+                  href="#countries-section"
+                  onClick={handleScrollToCountries}
+                  className="flex items-center group"
+                >
+                  <Globe className="h-5 w-5 mr-2 group-hover:rotate-45 transition-transform" />
+                  Discover Countries
+                </Link>
+              </Button>
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ 
+              duration: 0.8, 
+              type: "spring",
+              delay: 0.4,
+              bounce: 0.4
+            }}
+            className="relative w-full lg:w-2/5 aspect-square"
+          >
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-100 to-amber-200/30 blur-xl transform -translate-x-1/4 -translate-y-1/4"></div>
+            <div className="relative">
+              <motion.div
+                animate={{ 
+                  rotateZ: 360,
+                  transition: { 
+                    duration: 60, 
+                    ease: "linear", 
+                    repeat: Infinity 
+                  }
+                }}
+              >
+                <Image
+                  src="/images/hero-food.png"
+                  alt="Delicious world cuisine"
+                  priority
+                  width={600}
+                  height={600}
+                  className="object-cover drop-shadow-xl"
+                />
+              </motion.div>
+              
+              {/* Floating decorative elements around the main image */}
+              <motion.div
+                className="absolute -top-5 -right-5 bg-white p-3 rounded-full shadow-lg"
+                initial={{ y: 0 }}
+                animate={{ y: [-10, 10, -10] }}
+                transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+              >
+                <ChefHat className="h-6 w-6 text-amber-500" />
+              </motion.div>
+              
+              <motion.div
+                className="absolute bottom-10 -left-10 bg-white p-2 rounded-full shadow-lg"
+                initial={{ y: 0 }}
+                animate={{ y: [10, -10, 10] }}
+                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 1 }}
+              >
+                <UtensilsCrossed className="h-5 w-5 text-amber-600" />
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+      
+      {/* Gradient bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
     </section>
   );
 }

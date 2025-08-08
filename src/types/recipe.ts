@@ -8,11 +8,13 @@ export type Recipe = InferSelectModel<typeof schema.recipe>;
 
 export interface RecipeWithCountry extends Recipe {
   countryName: string;
+  countrySlug: string;
 }
 export interface RecipeQueryOptions {
   limit?: number;
   offset?: number;
   countrySlug?: string;
+  excludeIds?: string[];
 }
 
 export type User = InferSelectModel<typeof schema.user>;

@@ -19,6 +19,7 @@ import {
   InputOTPSeparator,
 } from "@/components/ui/input-otp";
 import { signInOTP } from "@/actions/auth";
+import { sendOTP } from "@/actions/auth";
 import { useFormStatus } from "react-dom";
 
 function VerifyButton() {
@@ -54,8 +55,29 @@ export function VerifyForm() {
 
   const handleResendCode = async () => {
     setError("");
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    alert("A new verification code has been sent to your email");
+    setOtp("");
+    
+    if (!email) {
+      setError("Email is required to resend code");
+      return;
+    }
+    
+    const formData = new FormData();
+    formData.append("email", email);
+    
+    try {
+      const result = await sendOTP(formData);
+      
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      
+      alert("A new verification code has been sent to your email");
+    } catch (error) {
+      console.error("Failed to resend code:", error);
+      setError("Failed to resend verification code");
+    }
   };
 
   return (

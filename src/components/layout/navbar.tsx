@@ -103,6 +103,15 @@ export function Navbar({
                   {route.label}
                 </Link>
               ))}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setIsOpen(false)}
+                  className="bg-amber-600 text-white hover:bg-amber-700 px-4 py-2 rounded-md text-sm font-medium transition-colors w-full text-center"
+                >
+                  Admin Panel
+                </Link>
+              )}
               {isLoggedIn ? (
                 <LogoutButton />
               ) : (
